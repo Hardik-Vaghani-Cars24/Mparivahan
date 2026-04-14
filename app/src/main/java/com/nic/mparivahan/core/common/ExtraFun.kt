@@ -4,27 +4,27 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
+import com.nic.mparivahan.core.util.BASE_TAG
+fun String.generateAESKeyBytes(): ByteArray {
+    return this.generateAESKey().toByteArray()
+}
 
-fun generateAESKey(secret: String): ByteArray {
-    require(secret.length >= 4) { "Minimum 4 characters required" }
+fun String.generateAESKey(): String {
+    require(this.length >= 4) { "Minimum 4 characters required" }
 
-    val len = secret.length
+    val len = this.length
 
     // last 4 reversed
-    val l1 = secret[len - 1]
-    val l2 = secret[len - 2]
-    val l3 = secret[len - 3]
-    val l4 = secret[len - 4]
+    val l1 = this[len - 1]
+    val l2 = this[len - 2]
+    val l3 = this[len - 3]
+    val l4 = this[len - 4]
 
     // first 4 reversed
-    val f1 = secret[3]
-    val f2 = secret[2]
-    val f3 = secret[1]
-    val f4 = secret[0]
+    val f1 = this[3]
+    val f2 = this[2]
+    val f3 = this[1]
+    val f4 = this[0]
 
     val finalStr = buildString(16) {
         append(l1).append(l2).append(l3).append(l4)
@@ -32,10 +32,20 @@ fun generateAESKey(secret: String): ByteArray {
         append("!~)#@*&^")
     }
 
-    log("GenerateAESKey", State.PROCESS.value) { "KEY \uD83D\uDD10- $finalStr" }
+    log("${BASE_TAG}GenerateAESKey", State.PROCESS.value) { "KEY 🔐- $finalStr" }
 
-    return finalStr.toByteArray() //🔐
+    return finalStr
 }
+
+fun String.decode64(): String {
+    val decodeData = android.util.Base64.decode(this, 0)
+    return String(decodeData, Charsets.UTF_8)
+}
+
+fun String?.isNullLike(): Boolean =
+    this == null || isBlank() ||
+            equals("null", ignoreCase = false) ||
+            equals("NA", ignoreCase = true)
 
 fun getEndpoint(url : String , flag : Int = 1) : String {
     return when (flag) {

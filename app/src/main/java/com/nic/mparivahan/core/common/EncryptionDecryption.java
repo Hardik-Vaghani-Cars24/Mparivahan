@@ -1,6 +1,7 @@
 package com.nic.mparivahan.core.common;
 
 import static com.nic.mparivahan.core.common.ExtraFunKt.generateAESKey;
+import static com.nic.mparivahan.core.common.ExtraFunKt.generateAESKeyBytes;
 import static org.bouncycastle.pqc.jcajce.provider.util.CipherSpiExt.DECRYPT_MODE;
 import static org.bouncycastle.pqc.jcajce.provider.util.CipherSpiExt.ENCRYPT_MODE;
 
@@ -64,7 +65,8 @@ public class EncryptionDecryption {
 */
 
             //byte[] r12_bytes = r12_str.getBytes(r1_charset);
-            byte[] r12_bytes = generateAESKey(stock);
+            //byte[] r12_bytes = generateAESKey(stock);
+            byte[] r12_bytes = generateAESKeyBytes(stock);
 
             Intrinsics.checkNotNullExpressionValue(r12_bytes, "this as java.lang.String).getBytes(charset)");
             //LoggerFunctionKt.log("KEY_DEBUG" , State.PROCESS.getValue(), () ->  " PROCESS : KEY length - "+ new String(r12_bytes, Charsets.UTF_8).length() );
@@ -202,7 +204,8 @@ public class EncryptionDecryption {
             Intrinsics.checkNotNullExpressionValue(bytes, "this as java.lang.String).getBytes(charset)");
 */
 
-            byte[] keyBytes = generateAESKey(stock);
+            //byte[] keyBytes = generateAESKey(stock);
+            byte[] keyBytes = generateAESKeyBytes(stock);
             SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
 //            SecretKeySpec secretKeySpec = new SecretKeySpec(bytes, "AES");
 

@@ -6,6 +6,8 @@ import com.google.gson.Gson
 import com.nic.mparivahan.core.common.EncryptionDecryption
 import com.nic.mparivahan.core.common.State
 import com.nic.mparivahan.core.common.base64Decode
+import com.nic.mparivahan.core.common.decode64
+import com.nic.mparivahan.core.common.decryptWithAES
 import com.nic.mparivahan.core.common.log
 import com.nic.mparivahan.core.common.toModel
 import com.nic.mparivahan.core.datastore.RequestResponseDataStore
@@ -73,9 +75,26 @@ class ApiPortalRepositoryImpl @Inject constructor(
 
             val appResponse = Gson().fromJson(raw , SecurityModel::class.java)
 
-            val decoded = appResponse.data?.let { String(base64Decode(it), Charsets.UTF_8) } ?: ""
+            //val decoded = appResponse.data?.let { String(base64Decode(it), Charsets.UTF_8) } ?: ""
+            //val decryptedValue : String = EncryptionDecryption().a(decoded , timeStamp).toString()
+            val decoded = try {
+                appResponse.data?.decode64()
+            } catch (e: Exception) {
+                log(TAG, State.ERROR.value) { "Base64 decode failed: ${e.message}" }
+                return@flow
+            }
 
-            val decryptedValue : String = EncryptionDecryption().a(decoded , timeStamp).toString()
+            val decryptedValue = try {
+                decoded?.decryptWithAES(timeStamp)
+            } catch (e: Exception) {
+                log(TAG, State.ERROR.value) { "Decryption failed: ${e.message}" }
+                return@flow
+            }
+
+            if (decryptedValue.isNullOrEmpty()) {
+                log(TAG, State.ERROR.value) { "Decrypted data is null" }
+                return@flow
+            }
 
             @Suppress("UNCHECKED_CAST")
             val result = decryptedValue as T
